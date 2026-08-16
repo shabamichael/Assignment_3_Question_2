@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 
-using namespace std;
+using std::string;
 
 // Custom namespace to encapsulate domain-specific entities
 namespace StoreManagement
@@ -60,7 +60,6 @@ namespace StoreManagement
 		bool hasWarranty() const;
 		// Returns true if the customer purchased warranty plan.
 
-
 		// --- Mutators (Setters) ---
 
 		void setPrice(double price);
@@ -89,7 +88,7 @@ namespace StoreManagement
 		double calculateDiscountAmount() const;
 		// Calculate the exact discount value in Rands
 
-		void displayProductSummary(ostream& out) const;
+		void displayProductSummary(std::ostream& out) const;
 		// Display product properties and both total prices to output stream
 
 
