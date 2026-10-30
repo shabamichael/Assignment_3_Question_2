@@ -1,95 +1,160 @@
-//Implemetation of the Product
 #include "Product.h"
 #include <iomanip>
-using namespace storeManagement;
 
-Product::Product():
-    productId("Unknown"),
-    productName("Unknown"),
-    category("General"),
-    basePrice (0.0),
-    warrantyCost(0.0),
-    discountPercentage(0.0),
-    warrantyPurchased(false),
-    discountAmount(0.0){}
-// Default constructor initialises all members to safe default values
+using namespace std;
 
-Product::Product(const string& id, const string& name, const string& cat, 
-    double price, double warranty, double dRate , bool hasWarranty):
-    productId(id),
-    productName(name),
-    category(cat),
-    basePrice(price),
-    warrantyCost(warranty),
-    discountPercentage(dRate),
-    warrantyPurchased(warrantyCost > 0.0),
-    discountAmount((discountPercentage/ 100.0) * basePrice){}
-// Overloaded constructor implementation
+namespace StoreManagement {
 
+    // ========================================================
+    // Abstract Base Class: Product Implementation
+    // ========================================================
 
-// --- Accessors (Getters) ---
-
-string Product::getName() const { return this->productName;}
-string Product::getCategory() const { return this->category; }
-double Product::getPrice() const { return this->basePrice;}
-double Product::getWarranty() const { return this->warrantyCost;}
-double Product::getDiscountPercentage() const { return this->discountPercentage;}
-string Product::getProductId() const { return this->productId;}
-bool Product::hasWarranty() const { return warrantyPurchased;}
-
-
-// --- Setters ---
-
-void Product::setPrice(double price) { if (price >= 0.0) this->basePrice = price;}
-void setWarrantyValue(double warranty);
-
-void Product::setDiscountRate(double discountPct){}
-// Sets discount rate
-
-void setName(const string& name);
-// Set product name
-
-void setCategory(const string& category);
-// Set product category
-
-void Product::setPrice(double p) { if (p >= 0) price = p; }
-void Product::setWarrantyValue(double w) { if (w >= 0) warrantyValue = w; }
-void Product::setDiscountRate(double d) { if (d >= 0 && d <= 100) discountRate = d; }
-
-// PURPOSE: Calculates discount in Rands from percentage
-double Product::calculateDiscountAmount() const {
-    return price * (discountRate / 100.0);
-}
-
-// PURPOSE: Price + Warranty without discount
-double Product::getPriceWithWarrantyNoDiscount() const {
-    return price + warrantyValue;
-}
-
-// PURPOSE: Price + Warranty WITH discount - This is the special offer
-double Product::getPriceWithWarrantyAndDiscount() const {
-    return (price - calculateDiscountAmount()) + warrantyValue;
-}
-
-// PURPOSE: General final price logic
-double Product::getFinalPrice(bool withWarranty) const {
-    if (withWarranty) {
-        // Criterion for discount met
-        return getPriceWithWarrantyAndDiscount();
+    // Purpose: Default Constructor - allocates dynamic memory on the heap
+    Product::Product()
+        : name("Unknown"), category("General"), warranty_cost(0.0), discount_percentage(0.0) {
+        base_price = new double(0.0);
     }
-    else {
-        return price; // no warranty, no discount
-    }
-}
 
-// PURPOSE: Display product summary
-void Product::display(ostream& out) const {
-    out << fixed << setprecision(2);
-    out << "ID: " << productId << " | " << name << " [" << category << "]" << endl;
-    out << " Base Price: R" << price << endl;
-    out << " Warranty Plan: R" << warrantyValue << endl;
-    out << " Discount (if warranty taken): " << discountRate << "% (R" << calculateDiscountAmount() << ")" << endl;
-    out << " -> Price incl. warranty (NO discount): R" << getPriceWithWarrantyNoDiscount() << endl;
-    out << " -> Price incl. warranty (WITH discount): R" << getPriceWithWarrantyAndDiscount() << endl;
-    out << "--------------------------------------------------" << endl;
-}
+    // Purpose: Parameterized Constructor - initializes attributes and allocates dynamic memory
+    Product::Product(string name, string category, double basePrice, double warrantyCost, double discountPct)
+        : name(name), category(category), warranty_cost(warrantyCost), discount_percentage(discountPct) {
+        base_price = new double((basePrice >= 0) ? basePrice : 0.0);
+    }
+
+    // Purpose: Virtual Destructor - deallocates heap memory safely
+    Product::~Product() {
+        delete base_price;
+        base_price = nullptr;
+    }
+
+    // Purpose: Copy Constructor - performs deep copying of dynamically allocated members
+    Product::Product(const Product& other)
+        : name(other.name), category(other.category), warranty_cost(other.warranty_cost), discount_percentage(other.discount_percentage) {
+        base_price = new double(*(other.base_price));
+    }
+
+    // Purpose: Overloaded Assignment Operator - ensures deep assignment and avoids memory leaks
+    Product& Product::operator=(const Product& other) {
+        if (this != &other) {
+            name = other.name;
+            category = other.category;
+            warranty_cost = other.warranty_cost;
+            discount_percentage = other.discount_percentage;
+
+            delete base_price;
+            base_price = new double(*(other.base_price));
+        }
+        return *this;
+    }
+
+    // Getters & Setters
+    string Product::get_name() const { return name; }
+    string Product::get_category() const { return category; }
+    double Product::get_base_price() const { return *base_price; }
+    double Product::get_warranty_cost() const { return warranty_cost; }
+    double Product::get_discount_percentage() const { return discount_percentage; }
+
+    void Product::set_name(const string& n) { name = n; }
+    void Product::set_category(const string& c) { category = c; }
+    void Product::set_base_price(double basePrice) { *base_price = (basePrice >= 0) ? basePrice : 0.0; }
+    void Product::set_warranty_cost(double warrantyCost) { warranty_cost = (warrantyCost >= 0) ? warrantyCost : 0.0; }
+    void Product::set_discount_percentage(double discountPct) { discount_percentage = (discountPct >= 0) ? discountPct : 0.0; }
+
+    // Purpose: Calculates discount value in Rands
+    double Product::calculate_discount_amount() const {
+        return (*base_price) * (discount_percentage / 100.0);
+    }
+
+    // Purpose: Overloaded '+' Operator - calculates combined base price of two products
+    double Product::operator+(const Product& rightOperand) const {
+        return (*this->base_price) + (*rightOperand.base_price);
+    }
+
+    // Purpose: Overloaded '==' Operator - tests equality between two products by name and price
+    bool Product::operator==(const Product& rightOperand) const {
+        return (this->name == rightOperand.name && (*this->base_price) == (*rightOperand.base_price));
+    }
+
+    // Purpose: Friend function output stream operator overload
+    ostream& operator<<(ostream& out, const Product& prod) {
+        prod.display_product_summary(out);
+        return out;
+    }
+
+    // ========================================================
+    // Derived Class 1: ElectronicsProduct Implementation
+    // ========================================================
+
+    ElectronicsProduct::ElectronicsProduct()
+        : Product("Generic Electronics", "Electronics", 0.0, 0.0, 0.0), guarantee_months(12) {
+    }
+
+    ElectronicsProduct::ElectronicsProduct(string name, double basePrice, double warrantyCost, double discountPct, int guaranteeMonths)
+        : Product(name, "Electronics", basePrice, warrantyCost, discountPct), guarantee_months(guaranteeMonths) {
+    }
+
+    // Purpose: Polymorphic price calculation without discount (Base + Warranty)
+    double ElectronicsProduct::calculate_price_no_discount() const {
+        return get_base_price() + warranty_cost;
+    }
+
+    // Purpose: Polymorphic price calculation with discount (Base - Discount + Warranty)
+    double ElectronicsProduct::calculate_price_with_discount() const {
+        return (get_base_price() - calculate_discount_amount()) + warranty_cost;
+    }
+
+    int ElectronicsProduct::get_guarantee_months() const { return guarantee_months; }
+
+    // Purpose: Formatted output for Electronics details
+    void ElectronicsProduct::display_product_summary(ostream& out) const {
+        out << fixed << setprecision(2);
+        out << "--------------------------------------------------------\n"
+            << "Type                   : Electronics\n"
+            << "Product Name           : " << name << "\n"
+            << "Guarantee Period       : " << guarantee_months << " Months\n"
+            << "Base Price             : R " << get_base_price() << "\n"
+            << "Warranty Plan Value    : R " << warranty_cost << "\n"
+            << "Discount Rate          : " << discount_percentage << "%\n"
+            << "Price incl. Warranty (NO discount)   : R " << calculate_price_no_discount() << "\n"
+            << "Price incl. Warranty (WITH discount) : R " << calculate_price_with_discount() << "\n";
+    }
+
+    // ========================================================
+    // Derived Class 2: ApplianceProduct Implementation
+    // ========================================================
+
+    ApplianceProduct::ApplianceProduct()
+        : Product("Generic Appliance", "Appliances", 0.0, 0.0, 0.0), delivery_fee(0.0) {
+    }
+
+    ApplianceProduct::ApplianceProduct(string name, double basePrice, double warrantyCost, double discountPct, double deliveryFee)
+        : Product(name, "Appliances", basePrice, warrantyCost, discountPct), delivery_fee(deliveryFee) {
+    }
+
+    // Purpose: Polymorphic price calculation including delivery fee (Base + Warranty + Delivery)
+    double ApplianceProduct::calculate_price_no_discount() const {
+        return get_base_price() + warranty_cost + delivery_fee;
+    }
+
+    // Purpose: Polymorphic price calculation with discount and delivery fee
+    double ApplianceProduct::calculate_price_with_discount() const {
+        return (get_base_price() - calculate_discount_amount()) + warranty_cost + delivery_fee;
+    }
+
+    double ApplianceProduct::get_delivery_fee() const { return delivery_fee; }
+
+    // Purpose: Formatted output for Home Appliance details
+    void ApplianceProduct::display_product_summary(ostream& out) const {
+        out << fixed << setprecision(2);
+        out << "--------------------------------------------------------\n"
+            << "Type                   : Home Appliance\n"
+            << "Product Name           : " << name << "\n"
+            << "Delivery Fee           : R " << delivery_fee << "\n"
+            << "Base Price             : R " << get_base_price() << "\n"
+            << "Warranty Plan Value    : R " << warranty_cost << "\n"
+            << "Discount Rate          : " << discount_percentage << "%\n"
+            << "Price incl. Warranty (NO discount)   : R " << calculate_price_no_discount() << "\n"
+            << "Price incl. Warranty (WITH discount) : R " << calculate_price_with_discount() << "\n";
+    }
+
+} // namespace StoreManagement

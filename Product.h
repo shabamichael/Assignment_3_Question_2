@@ -4,164 +4,99 @@
 #include <string>
 #include <iostream>
 
-using std::string;
-using std::ostream;
+using namespace std;
 
-// Custom namespace to encapsulate domain-specific entities
-namespace storeManagement
-{
+// Custom namespace for modularity and preventing global name collisions
+namespace StoreManagement {
 
-	/**
-	 * @class Product
-	 * @brief Represents a retail product with pricing, warranty, and discount calculations.
+    // Abstract Base Class: Product (ADT)
+    class Product {
+    public:
+        // Default Constructor: Initializes default values and allocates dynamic memory
+        Product();
 
+        // Parameterized Constructor: Sets initial properties
+        Product(string name, string category, double basePrice, double warrantyCost, double discountPct);
 
-	 */
-	class Product {
-		/**
-		 * @param basePrice The pre-discount price of the product.
-		 * @param hasWarranty Whether the customer purchased the warranty plan.
-		 * @param name - product name e.g. "Dell Laptop"
-		 * @param category - product category/type e.g. "Electronics"
-		 * @param price - base price in Rands
-		 * @param warrantyValue - cost of warranty plan in Rands
-		 * @param discountRate - discount rate as percentage (0-100). Applied ONLY if warranty is purchased
-		 * @param productId - unique identifier
-		 * @return The final price after applying applicable discounts.
-		 */
+        // Virtual Destructor: Ensures proper polymorphic dynamic memory cleanup
+        virtual ~Product();
 
-	private:
-		string productId;
-		string productName;
-		string category;
-		double basePrice;
-		double warrantyCost;
-		double discountPercentage;
-		bool warrantyPurchased;
-		double discountAmount;
+        // Copy Constructor: Performs deep copy for dynamically allocated members
+        Product(const Product& other);
 
-		double monthlySales[12];
-		double* priceHistory;
-		int historyCount;
-		int historyCapacity;
+        // Overloaded Assignment Operator: Manages deep assignment between objects
+        Product& operator=(const Product& other);
 
+        // Accessor Functions (Getters)
+        string get_name() const;
+        string get_category() const;
+        double get_base_price() const;
+        double get_warranty_cost() const;
+        double get_discount_percentage() const;
 
-	protected:
+        // Mutator Functions (Setters)
+        void set_name(const string& name);
+        void set_category(const string& category);
+        void set_base_price(double basePrice);
+        void set_warranty_cost(double warrantyCost);
+        void set_discount_percentage(double discountPct);
 
+        // Pure Virtual Functions (Polymorphism & Abstract Data Type enforcement)
+        virtual double calculate_price_no_discount() const = 0;
+        virtual double calculate_price_with_discount() const = 0;
+        virtual void display_product_summary(ostream& out) const = 0;
 
+        // Helper Member Function: Calculates the discount value in Rands
+        double calculate_discount_amount() const;
 
+        // Overloaded Operators
+        double operator+(const Product& rightOperand) const; // Adds base prices of two products
+        bool operator==(const Product& rightOperand) const;   // Equality comparison
 
-	public:
+        // Friend Function: Stream insertion operator overload for direct output stream printing
+        friend ostream& operator<<(ostream& out, const Product& prod);
 
-		static const int HISTORY_SIZE = 3;
+    protected:
+        string name;
+        string category;
+        double* base_price;          // Dynamic memory pointer demonstration
+        double warranty_cost;       // Warranty plan value in Rands (R)
+        double discount_percentage; // Special discount rate %
+    };
 
-		Product();
-		// Default constructor initializing product attributes to default values
+    // Derived Class 1: ElectronicsProduct (Inheritance)
+    class ElectronicsProduct : public Product {
+    public:
+        ElectronicsProduct();
+        ElectronicsProduct(string name, double basePrice, double warrantyCost, double discountPct, int guaranteeMonths);
 
+        // Overridden Pure Virtual Functions (Polymorphism)
+        double calculate_price_no_discount() const override;
+        double calculate_price_with_discount() const override;
+        void display_product_summary(ostream& out) const override;
 
-		Product(
-			const string& id, 
-			const string& name, 
-			const string& category, 
-			double price, 
-			double warranty, 
-			double dRate, 
-			bool hasWarranty=false);
-		// Parameterized Constructor: Sets initial properties
-		
-		Product(const Product& other);
-		// Copy constructor - required for dynamic array deep copy
+        int get_guarantee_months() const;
 
+    private:
+        int guarantee_months;
+    };
 
-		virtual ~Product();
-		// Virtual Destructor to ensures safe  polymorphic
+    // Derived Class 2: ApplianceProduct (Inheritance)
+    class ApplianceProduct : public Product {
+    public:
+        ApplianceProduct();
+        ApplianceProduct(string name, double basePrice, double warrantyCost, double discountPct, double deliveryFee);
 
+        // Overridden Pure Virtual Functions (Polymorphism)
+        double calculate_price_no_discount() const override;
+        double calculate_price_with_discount() const override;
+        void display_product_summary(ostream& out) const override;
 
-		// --- Accessors (Getters) ---
+        double get_delivery_fee() const;
 
-		string getId() const;
-		// Returns product ID
-
-		string getName() const;
-		// Returns product name
-
-		string getCategory() const;
-		// Returns product category
-
-		double getPrice() const;
-		// Returns product base price 
-
-		double getWarranty() const;
-		// Returns warranty plan cost 
-
-		double getDiscountRate() const;
-		//Returns discount percentage rate
-		
-		bool hasWarranty() const;
-		// Returns true if the customer purchased warranty plan.
-
-
-		// --- Mutators (Setters) ---
-
-		void setPrice(double newPrice);
-		// Sets base price
-
-		void setWarrantyValue(double newWarranty);
-		// Sets warranty value
-
-		void setWarrntyPurchase(bool purchased);
-
-		void setDiscountRate(double discountPct);
-		// Sets discount rate
-
-		void setName(const string& name);
-		// Set product name
-
-		void setCategory(const string& category);
-		// Set product category
-
-
-		// --- Core Business Logic ---
-
-		double calculatePriceWithOutDiscount() const;
-		// Calculate price including warranty WITHOUT applying the discount
-
-		double calculatePriceWithDiscount() const;
-		// Calculate final price WITH warranty discount applied to base price
-
-		double calculateDiscountAmount() const;
-		// Calculate the exact discount value in Rands
-
-		friend void displayProductSummary(std::ostream& out) const;
-		// Display product properties and both total prices to output stream
-
-
-		double getFinalPrice(bool withWarranty) const;
-		// Determines final price based on whether warranty is taken
-		// @param withWarranty - true if warranty is purchased, false otherwise
-
-		double getPriceWithWarrantyAndDiscount() const;
-		// Calculates final price including warranty and WITH discount applied
-		// Criterion: Discount is only given if buyer agrees to purchase warranty plan
-		// Formula: (base price - discount) + warranty
-
-		void recordPriceChange(double newPrice);
-		// Records a new price into the fixed-size price_history array
-		// (shifting older values along once full), and updates 'price'.
-
-		void displayPriceHistory(ostream& out) const;
-		// Displays the recorded price history.
-
-		friend ostream& operator<<(ostream& out, const Product& product);
-		// Allows a Product object to be displayed
-
-		friend bool operator==(const Product& first, const Product& second) ;
-		// Compares two Product objects based on their IDs.
-
-		friend std::istream& operator>>(std::istream& in, Product& p);
-		friend bool operator==(const Product& p1, const Product& p2);
-		friend Product operator+(const Product& p1, const Product& p2);
-	};
+    private:
+        double delivery_fee;
+    };
 
 } // namespace StoreManagement
 

@@ -1,0 +1,40 @@
+========================================================
+            STORE INVENTORY REPORT FILE                 
+========================================================
+
+--------------------------------------------------------
+Type                   : Electronics
+Product Name           : 4K Smart TV
+Guarantee Period       : 24 Months
+Base Price             : R 8500.00
+Warranty Plan Value    : R 750.00
+Discount Rate          : 12.50%
+Price incl. Warranty (NO discount)   : R 9250.00
+Price incl. Warranty (WITH discount) : R 8187.50
+--------------------------------------------------------
+Type                   : Home Appliance
+Product Name           : Double Door Refrigerator
+Delivery Fee           : R 350.00
+Base Price             : R 12000.00
+Warranty Plan Value    : R 1200.00
+Discount Rate          : 15.00%
+Price incl. Warranty (NO discount)   : R 13550.00
+Price incl. Warranty (WITH discount) : R 11750.00
+--------------------------------------------------------
+Type                   : Electronics
+Product Name           : Gaming Laptop
+Guarantee Period       : 12 Months
+Base Price             : R 18500.00
+Warranty Plan Value    : R 1500.00
+Discount Rate          : 10.00%
+Price incl. Warranty (NO discount)   : R 20000.00
+Price incl. Warranty (WITH discount) : R 18150.00
+--------------------------------------------------------
+Type                   : Home Appliance
+Product Name           : Microwave Oven
+Delivery Fee           : R 100.00
+Base Price             : R 2200.00
+Warranty Plan Value    : R 250.00
+Discount Rate          : 8.00%
+Price incl. Warranty (NO discount)   : R 2550.00
+Price incl. Warranty (WITH discount) : R 2374.00
