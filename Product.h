@@ -7,10 +7,12 @@
 using namespace std;
 
 // Custom namespace for modularity and preventing global name collisions
-namespace StoreManagement {
+namespace StoreManagement 
+{
 
     // Abstract Base Class: Product (ADT)
-    class Product {
+    class Product 
+    {
     public:
         // Default Constructor: Initializes default values and allocates dynamic memory
         Product();
@@ -62,41 +64,7 @@ namespace StoreManagement {
         double* base_price;          // Dynamic memory pointer demonstration
         double warranty_cost;       // Warranty plan value in Rands (R)
         double discount_percentage; // Special discount rate %
-    };
-
-    // Derived Class 1: ElectronicsProduct (Inheritance)
-    class ElectronicsProduct : public Product {
-    public:
-        ElectronicsProduct();
-        ElectronicsProduct(string name, double basePrice, double warrantyCost, double discountPct, int guaranteeMonths);
-
-        // Overridden Pure Virtual Functions (Polymorphism)
-        double calculate_price_no_discount() const override;
-        double calculate_price_with_discount() const override;
-        void display_product_summary(ostream& out) const override;
-
-        int get_guarantee_months() const;
-
-    private:
-        int guarantee_months;
-    };
-
-    // Derived Class 2: ApplianceProduct (Inheritance)
-    class ApplianceProduct : public Product {
-    public:
-        ApplianceProduct();
-        ApplianceProduct(string name, double basePrice, double warrantyCost, double discountPct, double deliveryFee);
-
-        // Overridden Pure Virtual Functions (Polymorphism)
-        double calculate_price_no_discount() const override;
-        double calculate_price_with_discount() const override;
-        void display_product_summary(ostream& out) const override;
-
-        double get_delivery_fee() const;
-
-    private:
-        double delivery_fee;
-    };
+    };   
 
 } // namespace StoreManagement
 

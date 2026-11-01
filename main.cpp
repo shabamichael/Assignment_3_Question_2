@@ -2,6 +2,8 @@
 #include <fstream>
 #include "Product.h"
 #include "InventoryManager.h"
+#include "ApplianceProduct.h"
+#include "ElectronicsProduct.h"
 
 using namespace std;
 using namespace StoreManagement;
